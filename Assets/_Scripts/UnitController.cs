@@ -4,100 +4,131 @@ using UnityEngine;
 
 public class UnitController : MonoBehaviour {
 
-    //// private bool onGround;
-    ////private bool falling;
-    //private bool playerGrabbed;
+    // private bool onGround;
     //private bool falling;
+    private float fallSpeed = 0.25f;
+
+    public bool playerGrabbed;
+    private bool playerLetGo = false;
+    private bool falling;
     //private Rigidbody rb;
-    //private Animator animator;
+    private Animator animator;
+    public bool alive;
+    private Vector3 startPosition;
 
-    //// Use this for initialization
-    //void Start()
-    //{
-    //    //onGround = true;
-    //    falling = false;
-    //    playerGrabbed = false;
-    //    rb = GetComponent<Rigidbody>();
-    //    animator = GetComponent<Animator>();
-    //}
+    public string name;
 
-    //// Update is called once per frame
-    //void Update()
-    //{
-    //    //screenPoint = Camera.main.WorldToScreenPoint(scanPos);
-    //    //if(rb.velocity.y < 0)
-    //    //{
-    //    //    Debug.Log("Falling!!!");
-    //    //}
+    // Use this for initialization
+    void Start()
+    {
+        //onGround = true;
+        falling = false;
+        playerGrabbed = false;
+        alive = true;
+        playerLetGo = false;
+        //rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+    }
 
-    //    if (playerGrabbed)
-    //    {
-    //        rb.useGravity = false;
-    //        if (Input.GetMouseButton(0))
-    //        {
-    //            //Debug.Log("MouseButtonDown yo");
-    //            //Debug.Log(String.Format("MouseX: {0} MouseY: {1}", Input.mousePosition.x, Input.mousePosition.y));
-    //            //Debug.Log(String.Format("ObjectX: {0} ObjectY: {1}", transform.position.x, transform.position.y));
-    //            var objectScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
-    //            //var mouseScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, objectWorldPosition.z);
-    //            //var mouseWorldPoint = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
-    //            Vector3 rayPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, objectScreenPosition.z);
-    //            var mouseWorldPoint = Camera.main.ScreenToWorldPoint(rayPosition);
-    //            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-    //            //Ray ray = Camera.main.ScreenPointToRay(rayPosition);
-    //            //RaycastHit hit;
+    // Update is called once per frame
+    void Update()
+    {
+        if (!alive)
+            return;
+        //screenPoint = Camera.main.WorldToScreenPoint(scanPos);
+        //if(rb.velocity.y < 0)
+        //{
+        //    Debug.Log("Falling!!!");
+        //}
 
-    //            //if (Physics.Raycast(ray, out hit))
-    //            //{
-    //            //transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
-    //            //var moveUp = transform.position.y - hit.point.y;
-    //            //transform.parent.gameObject.transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+        if (playerGrabbed && !Input.GetMouseButton(0))
+            playerLetGo = true;
 
-    //            //transform.parent.gameObject.transform.position = new Vector3(transform.parent.gameObject.transform.position.x, Mathf.Max(0.5f, mouseWorldPoint.y), transform.parent.gameObject.transform.position.z);
-    //            transform.position = new Vector3(transform.position.x, Mathf.Max(0.5f, mouseWorldPoint.y), transform.position.z);
-    //            //Debug.Log(hit.point.y);
-    //            playerGrabbed = true;
-    //            rb.useGravity = false;
-    //            rb.velocity = Vector3.zero;
-    //            //}
+        
 
-    //        }
-    //    }
-    //    else
-    //    {
-    //        rb.useGravity = true;
-    //    }
+        if (playerLetGo && alive)
+        {
+            //rb.useGravity = false;
+            
 
-    //    if (transform.position.y < -1f)
-    //    {
-    //        transform.position = new Vector3(transform.position.x, 0.5f, transform.position.z);
-    //    }
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y - fallSpeed, transform.position.z);
+                if (transform.position.y <= 0.5f)
+                {
+                    die();
+                }
+                //rb.useGravity = true;
+            }
+            
+        }
+        
 
-    //    if (rb.velocity.y < 0 && playerGrabbed)
-    //    {
-    //        falling = true;
-    //        //Debug.Log("Falling!!!");
-    //    }
+        //if (transform.position.y < -1f)
+        //{
+        //    transform.position = new Vector3(transform.position.x, 0.5f, transform.position.z);
+        //}
 
-    //    if (rb.velocity.y == 0 && falling)
-    //    {
-    //        die();
-    //    }
+        //if (rb.velocity.y < 0 && playerGrabbed)
+        //{
+        //    falling = true;
+        //    //Debug.Log("Falling!!!");
+        //}
 
-    //}
+        //if (rb.velocity.y == 0 && falling)
+        //{
+        //    die();
+        //}
 
-    //private void die()
-    //{
-    //    //Debug.Log("dead!!!");
-    //    animator.Play("Death");
+    }
+
+    public void grab()
+    {
+
+        //Debug.Log("MouseButtonDown yo");
+        //Debug.Log(String.Format("MouseX: {0} MouseY: {1}", Input.mousePosition.x, Input.mousePosition.y));
+        //Debug.Log(String.Format("ObjectX: {0} ObjectY: {1}", transform.position.x, transform.position.y));
+        var objectScreenPosition = Camera.main.WorldToScreenPoint(startPosition);
+        //var mouseScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, objectWorldPosition.z);
+        //var mouseWorldPoint = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
+        Vector3 rayPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, objectScreenPosition.z);
+        var mouseWorldPoint = Camera.main.ScreenToWorldPoint(rayPosition);
+        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //Ray ray = Camera.main.ScreenPointToRay(rayPosition);
+        //RaycastHit hit;
+
+        //if (Physics.Raycast(ray, out hit))
+        //{
+        //transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+        //var moveUp = transform.position.y - hit.point.y;
+        //transform.parent.gameObject.transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+
+        //transform.parent.gameObject.transform.position = new Vector3(transform.parent.gameObject.transform.position.x, Mathf.Max(0.5f, mouseWorldPoint.y), transform.parent.gameObject.transform.position.z);
+        transform.position = new Vector3(transform.position.x, Mathf.Max(0.5f, mouseWorldPoint.y), transform.position.z);
+        //Debug.Log(transform.position.y);
+        //Debug.Log(hit.point.y);
+        //playerGrabbed = true;
+        //rb.useGravity = false;
+        //rb.velocity = Vector3.zero;
+        //}
+        playerGrabbed = true;
 
 
-    //}
+    }
+
+    private void die()
+    {
+        Debug.Log("dead!!!");
+        animator.Play("Death");
+        alive = false;
+        GetComponent<Collider>().enabled = false;
+
+    }
 
     //private void OnMouseDown()
     //{
     //    Debug.Log("Footman on mouse down");
     //    playerGrabbed = true;
+    //    startPosition = transform.position;
 
 
     //    //Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
@@ -122,11 +153,14 @@ public class UnitController : MonoBehaviour {
 
     //private void OnMouseUp()
     //{
+    //    if (playerGrabbed)
+    //        playerLetGo = true;
     //    playerGrabbed = false;
+        
     //}
 
-    //private void OnMouseDrag()
-    //{
+    private void OnMouseDrag()
+    {
 
-    //}
+    }
 }
