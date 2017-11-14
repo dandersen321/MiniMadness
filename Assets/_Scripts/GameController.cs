@@ -7,6 +7,11 @@ public class GameController : MonoBehaviour
     private List<UnitController> enemies;
     private UnitController grabbedEnemy;
     // Use this for initialization
+
+    private UnitManager defenderManager;
+    private UnitManager enemyManager;
+
+
     void Start()
     {
         Screen.orientation = ScreenOrientation.LandscapeLeft;

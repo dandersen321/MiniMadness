@@ -18,6 +18,8 @@ public class UnitController : MonoBehaviour {
 
     public string name;
 
+    public int lane;
+
     // Use this for initialization
     void Start()
     {
