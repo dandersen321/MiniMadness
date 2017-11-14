@@ -32,18 +32,18 @@ public class GameController : MonoBehaviour
 
         }
         //startTime = Time.time;
-        defenderManager = new UnitManager(5, createDefenderManager(), false, 10);
-        enemyManager = new UnitManager(5, createDefenderManager(), true, 10);
+        defenderManager = new UnitManager(5, createDefenderManager(), false);
+        enemyManager = new UnitManager(5, createDefenderManager(), true);
     }
 
     List<UnitReserve> createDefenderManager()
     {
         List<UnitReserve> defenders = new List<UnitReserve>();
         defenders.Add(new UnitReserve(0, 0, soldierPrefab));
-        defenders.Add(new UnitReserve(1, 1, soldierPrefab));
-        defenders.Add(new UnitReserve(2, 2, soldierPrefab));
-        defenders.Add(new UnitReserve(3, 3, soldierPrefab));
-        defenders.Add(new UnitReserve(4, 4, soldierPrefab));
+        defenders.Add(new UnitReserve(0.2f, 1, soldierPrefab));
+        defenders.Add(new UnitReserve(0.4f, 2, soldierPrefab));
+        defenders.Add(new UnitReserve(0.6f, 3, soldierPrefab));
+        defenders.Add(new UnitReserve(0.8f, 4, soldierPrefab));
 
         return defenders;
     }

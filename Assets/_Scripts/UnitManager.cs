@@ -35,7 +35,7 @@ public class UnitManager {
 
     private bool isEnemy;
 
-    private int zCoordinate;
+    private float zCoordinate;
     private List<Vector3> spawnPositions;
 
     private GameController gameController;
@@ -44,25 +44,52 @@ public class UnitManager {
     //private float timeUntilNextSpawn;
 
 
-    public UnitManager(int lanes, List<UnitReserve> reserves, bool isEnemy, int zCoordinate)
+    public UnitManager(int lanes, List<UnitReserve> reserves, bool isEnemy, int? zCoordinate = null)
     {
         this.numberOfLanes = lanes;
         this.reserves = reserves;
         this.isEnemy = isEnemy;
-        this.zCoordinate = zCoordinate;
 
         units = new List<UnitController>();
 
         GameObject floor = GameObject.FindGameObjectWithTag("Floor");
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
-        float height = floor.GetComponent<Renderer>().bounds.size.x;
-        float buffer = 5;
-        float interval = (height - buffer) / lanes;
-        spawnPositions = new List<Vector3>();
-        for (int i = 0; i < lanes; ++i)
+        float heightBuffer = 5;
+        float widthBuffer = 5;
+        var floorSize = floor.GetComponent<Renderer>().bounds.size;
+        float height = floorSize.x - heightBuffer;
+        float width = floorSize.z - widthBuffer;
+        Debug.Log("Floor height: " + height.ToString());
+
+        // yuck but oh well
+        // if we don't have a z coordinate then use the default
+        if (zCoordinate != null)
         {
-            spawnPositions.Add(new Vector3(interval * i + buffer, 1, zCoordinate));
+            this.zCoordinate = (int)zCoordinate;
+        }
+        else
+        {
+            float edge = width / 2;
+            if(isEnemy)
+            {
+                this.zCoordinate = edge;
+            }
+            else
+            {
+                this.zCoordinate = -edge;
+            }
+        }
+
+
+
+            float interval = (height) / lanes;
+        spawnPositions = new List<Vector3>();
+        for (int i = 1; i <= lanes; ++i)
+        {
+            //height/2 because floor goes from -X to X
+            spawnPositions.Add(new Vector3(interval * i - height/2, 1, this.zCoordinate));
+            Debug.Log(spawnPositions[i-1].x);
         }
     }
 
@@ -76,11 +103,13 @@ public class UnitManager {
     //void Update()
     public void updateUnits()
     {
-        foreach(var reserve in reserves)
+        for (int i = reserves.Count-1; i >=0; i--)
         {
+            var reserve = reserves[i];
             if(reserve.spawnTime <= Time.time && laneIsEmpty(reserve.lane))
             {
                 spawn(reserve);
+                reserves.RemoveAt(i);
             }
         }
         //if (numberOfReserves > 0)
@@ -118,7 +147,15 @@ public class UnitManager {
         //units.Add(newUnit);
 
         // TODO add rotation
-        Quaternion rotation = new Quaternion(0, 0, 0, 0);
+        Quaternion rotation = reserve.unitPrefab.transform.rotation;
+        if(isEnemy)
+        {
+            rotation = Quaternion.LookRotation(Vector3.back);
+        }
+        else
+        {
+            rotation = Quaternion.LookRotation(Vector3.forward);
+        }
         GameObject newUnit = GameObject.Instantiate(reserve.unitPrefab, spawnPositions[reserve.lane], rotation);
         units.Add(newUnit.GetComponent<UnitController>());
 
