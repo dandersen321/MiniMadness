@@ -11,7 +11,7 @@ public class GameController : MonoBehaviour
     private UnitManager defenderManager;
     private UnitManager enemyManager;
 
-    public float gameTimer;
+    //public float gameTimer;
     private float startTime;
 
 
@@ -31,7 +31,7 @@ public class GameController : MonoBehaviour
             enemies.Add(unit);
 
         }
-        startTime = Time.time;
+        //startTime = Time.time;
         defenderManager = new UnitManager(5, createDefenderManager(), false, 10);
         enemyManager = new UnitManager(5, createDefenderManager(), true, 10);
     }
@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        gameTimer = Time.time - startTime;
+        //gameTimer = Time.time - startTime;
 
         enemyManager.updateUnits();
         defenderManager.updateUnits();

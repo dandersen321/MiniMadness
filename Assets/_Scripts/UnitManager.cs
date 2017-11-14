@@ -78,7 +78,7 @@ public class UnitManager {
     {
         foreach(var reserve in reserves)
         {
-            if(reserve.spawnTime <= gameController.gameTimer && laneIsEmpty(reserve.lane))
+            if(reserve.spawnTime <= Time.time && laneIsEmpty(reserve.lane))
             {
                 spawn(reserve);
             }
@@ -104,11 +104,11 @@ public class UnitManager {
     {
         foreach(UnitController unit in units)
         {
-            float unitSizeZ = unit.GetComponent<Renderer>().bounds.size.z;
+            float unitSizeZ = unit.GetComponent<Collider>().bounds.size.z;
             if (unit.lane == lane && Mathf.Abs(unitSizeZ - zCoordinate) > unitSizeZ)
-                return true;
+                return false;
         }
-        return false;
+        return true;
     }
 
     public void spawn(UnitReserve reserve)

@@ -723,7 +723,7 @@ GameObject:
   - component: {fileID: 164981431}
   m_Layer: 0
   m_Name: GameController
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -739,7 +739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3046cb2a66df4949b8a2508657be23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameTimer: 0
   soldierPrefab: {fileID: 100048, guid: 272ec112bddec644a8af6599107e74f7, type: 2}
 --- !u!4 &164981432
 Transform:
@@ -1696,19 +1695,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400036, guid: 272ec112bddec644a8af6599107e74f7, type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0.41948426
+      value: -0.4194843
       objectReference: {fileID: 0}
     - target: {fileID: 400036, guid: 272ec112bddec644a8af6599107e74f7, type: 2}
       propertyPath: m_LocalRotation.y
-      value: 0.56286
+      value: 0.5628601
       objectReference: {fileID: 0}
     - target: {fileID: 400036, guid: 272ec112bddec644a8af6599107e74f7, type: 2}
       propertyPath: m_LocalRotation.z
-      value: 0.65476775
+      value: 0.6547678
       objectReference: {fileID: 0}
     - target: {fileID: 400036, guid: 272ec112bddec644a8af6599107e74f7, type: 2}
       propertyPath: m_LocalRotation.w
-      value: 0.28017974
+      value: 0.28017977
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 272ec112bddec644a8af6599107e74f7, type: 2}
@@ -8032,7 +8031,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10756, guid: 0000000000000000e000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
