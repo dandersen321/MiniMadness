@@ -11,6 +11,11 @@ public class GameController : MonoBehaviour
     private UnitManager defenderManager;
     private UnitManager enemyManager;
 
+    public float gameTimer;
+    private float startTime;
+
+
+    public GameObject soldierPrefab;
 
     void Start()
     {
@@ -26,11 +31,31 @@ public class GameController : MonoBehaviour
             enemies.Add(unit);
 
         }
+        startTime = Time.time;
+        defenderManager = new UnitManager(5, createDefenderManager(), false, 10);
+        enemyManager = new UnitManager(5, createDefenderManager(), true, 10);
+    }
+
+    List<UnitReserve> createDefenderManager()
+    {
+        List<UnitReserve> defenders = new List<UnitReserve>();
+        defenders.Add(new UnitReserve(0, 0, soldierPrefab));
+        defenders.Add(new UnitReserve(1, 1, soldierPrefab));
+        defenders.Add(new UnitReserve(2, 2, soldierPrefab));
+        defenders.Add(new UnitReserve(3, 3, soldierPrefab));
+        defenders.Add(new UnitReserve(4, 4, soldierPrefab));
+
+        return defenders;
     }
 
     // Update is called once per frame
     void Update()
     {
+        gameTimer = Time.time - startTime;
+
+        enemyManager.updateUnits();
+        defenderManager.updateUnits();
+
 
         if (Input.GetMouseButton(0))
         {

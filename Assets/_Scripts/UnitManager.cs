@@ -2,39 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitManager : MonoBehaviour {
+public struct UnitReserve
+{
+    public float spawnTime;
+    public GameObject unitPrefab;
+    public int lane;
+
+    public UnitReserve(float spawnTime, int lane, GameObject unitPrefab)
+    {
+        this.spawnTime = spawnTime;
+        this.lane = lane;
+        this.unitPrefab = unitPrefab;
+    }
+}
+
+public class UnitManager {
 
     //public List<UnitController> defenders;
     //public List<UnitController> enemies;
 
     private int numberOfLanes;
     //private int numberOfReserves;
-    private List<GameObject> reserves;
+    //private List<GameObject> reserves;
     //private int defenderReserves;
     //private int enemiesReserves;
 
     //private Spawner enemySpawner;
     //private Spawner defenderSpawner;
 
-    public List<UnitController> units;
+    public List<UnitReserve> reserves;
+    private List<UnitController> units;
 
     private bool isEnemy;
 
     private int zCoordinate;
     private List<Vector3> spawnPositions;
 
+    private GameController gameController;
+
     //private GameObject floor;
     //private float timeUntilNextSpawn;
 
 
-    public UnitManager(int lanes, List<GameObject> reserves, bool isEnemy, int zCoordinate)
+    public UnitManager(int lanes, List<UnitReserve> reserves, bool isEnemy, int zCoordinate)
     {
         this.numberOfLanes = lanes;
-        this.numberOfReserves = numberOfReserves;
+        this.reserves = reserves;
         this.isEnemy = isEnemy;
         this.zCoordinate = zCoordinate;
 
-        GameObject floor = GameObject.FindGameObjectWithTag("floor");
+        units = new List<UnitController>();
+
+        GameObject floor = GameObject.FindGameObjectWithTag("Floor");
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
         float height = floor.GetComponent<Renderer>().bounds.size.x;
         float buffer = 5;
@@ -46,25 +66,33 @@ public class UnitManager : MonoBehaviour {
         }
     }
 
-	// Use this for initialization
-	void Start ()
-    {
-		
-	}
+    // Use this for initialization
+    //void Start ()
+    //   {
+
+    //}
 
     // Update is called once per frame
-    void Update()
+    //void Update()
+    public void updateUnits()
     {
-        if (numberOfReserves > 0)
+        foreach(var reserve in reserves)
         {
-            for (int i = 0; i < numberOfLanes; ++i)
+            if(reserve.spawnTime <= gameController.gameTimer && laneIsEmpty(reserve.lane))
             {
-                if (laneIsEmpty(i))
-                {
-                    spawn(i);
-                }
+                spawn(reserve);
             }
         }
+        //if (numberOfReserves > 0)
+        //{
+        //    for (int i = 0; i < numberOfLanes; ++i)
+        //    {
+        //        if (laneIsEmpty(i))
+        //        {
+        //            spawn(i);
+        //        }
+        //    }
+        //}
         
         //if (numberOfReserves > 0 && )
         //{
@@ -83,15 +111,16 @@ public class UnitManager : MonoBehaviour {
         return false;
     }
 
-    public void spawn(int laneNumber)
+    public void spawn(UnitReserve reserve)
     {
 
-        UnitController newUnit = new UnitController();
-        units.Add(newUnit);
-        Instantiate(newUnit, spawnPositions[laneNumber]);
-        
+        //UnitController newUnit = new UnitController();
+        //units.Add(newUnit);
 
-        // TODO: spawn
+        // TODO add rotation
+        Quaternion rotation = new Quaternion(0, 0, 0, 0);
+        GameObject newUnit = GameObject.Instantiate(reserve.unitPrefab, spawnPositions[reserve.lane], rotation);
+        units.Add(newUnit.GetComponent<UnitController>());
 
     }
 }
