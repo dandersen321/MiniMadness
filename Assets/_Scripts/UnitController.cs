@@ -7,11 +7,14 @@ public class UnitController : MonoBehaviour {
     // private bool onGround;
     //private bool falling;
     private float fallSpeed = 0.25f;
+    private float movementSpeed = 0.05f;
+
+
 
     public bool playerGrabbed;
     private bool playerLetGo = false;
     private bool falling;
-    //private Rigidbody rb;
+    private Rigidbody rb;
     private Animator animator;
     public bool alive;
     private Vector3 startPosition;
@@ -28,7 +31,7 @@ public class UnitController : MonoBehaviour {
         playerGrabbed = false;
         alive = true;
         playerLetGo = false;
-        //rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
     }
 
@@ -42,6 +45,9 @@ public class UnitController : MonoBehaviour {
         //{
         //    Debug.Log("Falling!!!");
         //}
+
+        //rb.velocity = transform.forward * movementSpeed;
+        rb.transform.Translate(Vector3.forward * movementSpeed);
 
         if (playerGrabbed && !Input.GetMouseButton(0))
             playerLetGo = true;
@@ -81,6 +87,11 @@ public class UnitController : MonoBehaviour {
         //    die();
         //}
 
+    }
+
+    public void init(UnitReserve reserve)
+    {
+        this.lane = reserve.lane;
     }
 
     public void grab()

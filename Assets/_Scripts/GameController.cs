@@ -32,20 +32,52 @@ public class GameController : MonoBehaviour
 
         }
         //startTime = Time.time;
-        defenderManager = new UnitManager(5, createDefenderManager(), false);
-        enemyManager = new UnitManager(5, createDefenderManager(), true);
+        defenderManager = new UnitManager(8, createDefenderManager(), false);
+        enemyManager = new UnitManager(8, createEnemyManager(), true);
     }
 
     List<UnitReserve> createDefenderManager()
     {
         List<UnitReserve> defenders = new List<UnitReserve>();
-        defenders.Add(new UnitReserve(0, 0, soldierPrefab));
-        defenders.Add(new UnitReserve(0.2f, 1, soldierPrefab));
-        defenders.Add(new UnitReserve(0.4f, 2, soldierPrefab));
-        defenders.Add(new UnitReserve(0.6f, 3, soldierPrefab));
-        defenders.Add(new UnitReserve(0.8f, 4, soldierPrefab));
+        //defenders.Add(new UnitReserve(0, 0, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.2f, 1, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.4f, 2, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.6f, 3, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.8f, 4, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.8f, 5, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.8f, 6, soldierPrefab));
+        //defenders.Add(new UnitReserve(0.8f, 7, soldierPrefab));
 
         return defenders;
+    }
+
+    List<UnitReserve> createEnemyManager()
+    {
+        List<UnitReserve> enemies = new List<UnitReserve>();
+        //enemies.Add(new UnitReserve(0, 0, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 1, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.4f, 2, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.6f, 3, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.8f, 4, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.8f, 5, soldierPrefab));
+        enemies.Add(new UnitReserve(0.1f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.8f, 7, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.1f, 0, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.3f, 1, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.5f, 2, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.6f, 3, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.9f, 4, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.9f, 5, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.9f, 7, soldierPrefab));
+
+        return enemies;
     }
 
     // Update is called once per frame

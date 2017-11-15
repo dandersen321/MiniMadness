@@ -88,7 +88,7 @@ public class UnitManager {
         for (int i = 1; i <= lanes; ++i)
         {
             //height/2 because floor goes from -X to X
-            spawnPositions.Add(new Vector3(interval * i - height/2, 1, this.zCoordinate));
+            spawnPositions.Add(new Vector3(interval * i - height/2, 0, this.zCoordinate));
             Debug.Log(spawnPositions[i-1].x);
         }
     }
@@ -133,8 +133,12 @@ public class UnitManager {
     {
         foreach(UnitController unit in units)
         {
-            float unitSizeZ = unit.GetComponent<Collider>().bounds.size.z;
-            if (unit.lane == lane && Mathf.Abs(unitSizeZ - zCoordinate) > unitSizeZ)
+            //float unitSizeZ = unit.GetComponent<Collider>().bounds.size.z;
+            //if (unit.lane == lane && Mathf.Abs(unitSizeZ - zCoordinate) > unitSizeZ)
+            // 1 instead of 2 to give some buffer space
+            var colliders = Physics.OverlapBox(spawnPositions[lane], unit.GetComponent<Collider>().bounds.size);
+            // 1 to ignore floor
+            if(colliders.Length > 1)
                 return false;
         }
         return true;
@@ -146,7 +150,7 @@ public class UnitManager {
         //UnitController newUnit = new UnitController();
         //units.Add(newUnit);
 
-        // TODO add rotation
+        // TODO add rotation 
         Quaternion rotation = reserve.unitPrefab.transform.rotation;
         if(isEnemy)
         {
@@ -156,8 +160,10 @@ public class UnitManager {
         {
             rotation = Quaternion.LookRotation(Vector3.forward);
         }
-        GameObject newUnit = GameObject.Instantiate(reserve.unitPrefab, spawnPositions[reserve.lane], rotation);
-        units.Add(newUnit.GetComponent<UnitController>());
+        GameObject newUnitObj = GameObject.Instantiate(reserve.unitPrefab, spawnPositions[reserve.lane], rotation);
+        UnitController unit = newUnitObj.GetComponent<UnitController>();
+        unit.init(reserve);
+        units.Add(unit);
 
     }
 }
