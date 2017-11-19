@@ -5,11 +5,11 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     private List<UnitController> enemies;
-    private UnitController grabbedEnemy;
+    private UnitController grabbedBaddie;
     // Use this for initialization
 
     private UnitManager defenderManager;
-    private UnitManager enemyManager;
+    private UnitManager baddieManager;
 
     //public float gameTimer;
     private float startTime;
@@ -20,47 +20,50 @@ public class GameController : MonoBehaviour
     void Start()
     {
         Screen.orientation = ScreenOrientation.LandscapeLeft;
-        grabbedEnemy = null;
+        grabbedBaddie = null;
         enemies = new List<UnitController>();
         int i = 0;
-        foreach (var obj in GameObject.FindGameObjectsWithTag("EnemyUnit"))
-        {
-            UnitController unit = obj.GetComponent<UnitController>();
-            unit.name = "Unit" + i.ToString();
-            i += 1;
-            enemies.Add(unit);
+        //foreach (var obj in GameObject.FindGameObjectsWithTag("BaddieUnit"))
+        //{
+        //    UnitController unit = obj.GetComponent<UnitController>();
+        //    unit.name = "Unit" + i.ToString();
+        //    i += 1;
+        //    enemies.Add(unit);
 
-        }
+        //}
         //startTime = Time.time;
         defenderManager = new UnitManager(8, createDefenderManager(), false);
-        enemyManager = new UnitManager(8, createEnemyManager(), true);
+        baddieManager = new UnitManager(8, createBaddieManager(), true);
     }
 
     List<UnitReserve> createDefenderManager()
     {
         List<UnitReserve> defenders = new List<UnitReserve>();
-        //defenders.Add(new UnitReserve(0, 0, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.2f, 1, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.4f, 2, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.6f, 3, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.8f, 4, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.8f, 5, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.8f, 6, soldierPrefab));
-        //defenders.Add(new UnitReserve(0.8f, 7, soldierPrefab));
+        defenders.Add(new UnitReserve(0, 0, soldierPrefab));
+        defenders.Add(new UnitReserve(0.2f, 1, soldierPrefab));
+        defenders.Add(new UnitReserve(0.4f, 2, soldierPrefab));
+        defenders.Add(new UnitReserve(0.6f, 3, soldierPrefab));
+        defenders.Add(new UnitReserve(0.8f, 4, soldierPrefab));
+        defenders.Add(new UnitReserve(0.8f, 5, soldierPrefab));
+        defenders.Add(new UnitReserve(0.8f, 6, soldierPrefab));
+        defenders.Add(new UnitReserve(0.8f, 7, soldierPrefab));
 
         return defenders;
     }
 
-    List<UnitReserve> createEnemyManager()
+    List<UnitReserve> createBaddieManager()
     {
         List<UnitReserve> enemies = new List<UnitReserve>();
-        //enemies.Add(new UnitReserve(0, 0, soldierPrefab));
-        //enemies.Add(new UnitReserve(0.2f, 1, soldierPrefab));
-        //enemies.Add(new UnitReserve(0.4f, 2, soldierPrefab));
-        //enemies.Add(new UnitReserve(0.6f, 3, soldierPrefab));
-        //enemies.Add(new UnitReserve(0.8f, 4, soldierPrefab));
-        //enemies.Add(new UnitReserve(0.8f, 5, soldierPrefab));
-        enemies.Add(new UnitReserve(0.1f, 6, soldierPrefab));
+        enemies.Add(new UnitReserve(0, 0, soldierPrefab));
+        enemies.Add(new UnitReserve(0.2f, 1, soldierPrefab));
+        enemies.Add(new UnitReserve(0.4f, 2, soldierPrefab));
+        enemies.Add(new UnitReserve(0.6f, 3, soldierPrefab));
+        enemies.Add(new UnitReserve(0.8f, 4, soldierPrefab));
+        enemies.Add(new UnitReserve(0.8f, 5, soldierPrefab));
+
+
+
+        //enemies.Add(new UnitReserve(0.1f, 6, soldierPrefab));
         //enemies.Add(new UnitReserve(0.8f, 7, soldierPrefab));
         //enemies.Add(new UnitReserve(0.1f, 0, soldierPrefab));
         //enemies.Add(new UnitReserve(0.3f, 1, soldierPrefab));
@@ -68,13 +71,15 @@ public class GameController : MonoBehaviour
         //enemies.Add(new UnitReserve(0.6f, 3, soldierPrefab));
         //enemies.Add(new UnitReserve(0.9f, 4, soldierPrefab));
         //enemies.Add(new UnitReserve(0.9f, 5, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
-        enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+        //enemies.Add(new UnitReserve(0.2f, 6, soldierPrefab));
+
         //enemies.Add(new UnitReserve(0.9f, 7, soldierPrefab));
 
         return enemies;
@@ -85,7 +90,7 @@ public class GameController : MonoBehaviour
     {
         //gameTimer = Time.time - startTime;
 
-        enemyManager.updateUnits();
+        baddieManager.updateUnits();
         defenderManager.updateUnits();
 
 
@@ -97,7 +102,7 @@ public class GameController : MonoBehaviour
         if(Input.GetMouseButtonUp(0))
         {
             Debug.Log("Released!");
-            grabbedEnemy = null;
+            grabbedBaddie = null;
         }
 
         //if(Input.GetMouseButtonDown(0))
@@ -115,17 +120,17 @@ public class GameController : MonoBehaviour
         //{
         //    Debug.Log(unit.transform.position);
         //}
-        //Debug.Log(grabbedEnemy.ToString());
-        UnitController unit = grabbedEnemy != null ? grabbedEnemy : FindClosestEnemy(Input.mousePosition);
-        grabbedEnemy = unit;
+        //Debug.Log(grabbedBaddie.ToString());
+        UnitController unit = grabbedBaddie != null ? grabbedBaddie : FindClosestBaddie(Input.mousePosition);
+        grabbedBaddie = unit;
         Debug.Log("Grabbed " + unit.name);
         unit.grab();
         //Debug.Log("Mouse down");
     }
 
-    public UnitController FindClosestEnemy(Vector3 position)
+    public UnitController FindClosestBaddie(Vector3 position)
     {
-        if(grabbedEnemy != null)
+        if(grabbedBaddie != null)
         {
             throw new System.Exception("why?");
         }
@@ -156,7 +161,7 @@ public class GameController : MonoBehaviour
         }
         return closest;
         //GameObject[] gos;
-        //gos = GameObject.FindGameObjectsWithTag("Enemy");
+        //gos = GameObject.FindGameObjectsWithTag("Baddie");
         //GameObject closest = null;
         //float distance = Mathf.Infinity;
         //Vector3 position = transform.position;

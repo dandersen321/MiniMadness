@@ -162,7 +162,7 @@ public class UnitManager {
         }
         GameObject newUnitObj = GameObject.Instantiate(reserve.unitPrefab, spawnPositions[reserve.lane], rotation);
         UnitController unit = newUnitObj.GetComponent<UnitController>();
-        unit.init(reserve);
+        unit.init(reserve, isEnemy);
         units.Add(unit);
 
     }

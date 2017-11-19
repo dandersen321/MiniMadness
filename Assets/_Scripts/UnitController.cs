@@ -2,6 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum UnitAnimations
+{
+    
+    walk,
+    run,
+    attack1,
+    attack2,
+    getHit,
+    death,
+    victory,
+    
+
+
+}
+
 public class UnitController : MonoBehaviour {
 
     // private bool onGround;
@@ -19,9 +34,20 @@ public class UnitController : MonoBehaviour {
     public bool alive;
     private Vector3 startPosition;
 
+    // what direction baddie/goodie is facing
+    private int zDirection;
+
     public string name;
 
     public int lane;
+
+    public bool isBaddie;
+
+    private float attackRadius;
+    private float health;
+    private float attackDamage;
+    private float attackCooldown;
+    private float timeUntilNextAttack = 0;
 
     // Use this for initialization
     void Start()
@@ -47,7 +73,7 @@ public class UnitController : MonoBehaviour {
         //}
 
         //rb.velocity = transform.forward * movementSpeed;
-        rb.transform.Translate(Vector3.forward * movementSpeed);
+        
 
         if (playerGrabbed && !Input.GetMouseButton(0))
             playerLetGo = true;
@@ -63,11 +89,23 @@ public class UnitController : MonoBehaviour {
                 transform.position = new Vector3(transform.position.x, transform.position.y - fallSpeed, transform.position.z);
                 if (transform.position.y <= 0.5f)
                 {
-                    die();
+                    //die();
+                    takeDamage(150f);
                 }
                 //rb.useGravity = true;
             }
             
+        }
+
+        var closestEnemy = getOpponentInAttackRadius();
+        if (closestEnemy != null)
+        {
+            if(timeUntilNextAttack < Time.time)
+                attack(closestEnemy);
+        }
+        else
+        {
+            move();
         }
         
 
@@ -89,9 +127,103 @@ public class UnitController : MonoBehaviour {
 
     }
 
-    public void init(UnitReserve reserve)
+    private void move()
+    {
+        rb.transform.Translate(Vector3.forward * movementSpeed);
+        playAnimation(UnitAnimations.run);
+    }
+
+    private UnitController getOpponentInAttackRadius()
+    {
+        // TODO: consider direction?
+        var colliders = Physics.OverlapBox(this.rb.position, this.GetComponent<Collider>().bounds.size + new Vector3(0, 0, attackRadius));
+        // 1 to ignore floor
+        float smallestDistance = Mathf.Infinity;
+        UnitController closest = null;
+
+        foreach (var collider in colliders)
+        {
+            var unit = collider.GetComponentInParent<UnitController>();
+            if(unit == null || !unit.alive || unit.isBaddie == this.isBaddie)
+            {
+                continue;
+            }
+            Vector3 diff = unit.rb.position - rb.position;
+            float curDistance = diff.sqrMagnitude;
+            if (curDistance < smallestDistance)
+            {
+                closest = unit;
+                smallestDistance = curDistance;
+            }
+        }
+
+        return closest;
+
+    }
+
+    private void attack(UnitController targetUnit)
+    {
+        // TODO: if unit hasn't moved or attacked in a while, die?
+        this.playAnimation(UnitAnimations.attack1);
+        targetUnit.takeDamage(attackDamage);
+        timeUntilNextAttack = Time.time + attackCooldown;
+
+    }
+
+    public void playAnimation(UnitAnimations anim)
+    {
+        string animName = null;
+        if (anim == UnitAnimations.death)
+            animName = "Death";
+        else if (anim == UnitAnimations.walk)
+            animName = "Walk";
+        else if (anim == UnitAnimations.run)
+            animName = "Run";
+        else if (anim == UnitAnimations.attack1)
+            animName = "Attack01";
+        else if (anim == UnitAnimations.attack2)
+            animName = "Attack02";
+        else if (anim == UnitAnimations.getHit)
+            animName = "GetHit";
+
+        if (animName != null)
+            //Debug.Log(animName);
+            animator.Play(animName);
+    }
+
+    public void init(UnitReserve reserve, bool isEnemy)
     {
         this.lane = reserve.lane;
+        this.isBaddie = isEnemy;
+        this.zDirection = isEnemy ? 1 : -1;
+        this.health = 100;
+        //if(isBaddie)
+        //{
+        //    this.health /= 2;
+        //}
+        this.attackDamage = 20f;
+        this.attackCooldown = 1;
+        this.attackRadius = 2.25f;
+        if(!isBaddie)
+        {
+            // give friendly units first hit
+            this.attackRadius += 0.1f;
+        }
+    }
+
+    private void takeDamage(float damage)
+    {
+        if (!alive)
+            return;
+        health -= damage;
+        if(health > 0)
+        {
+            //playAnimation(UnitAnimations.getHit);
+        }
+        else
+        {
+            die();
+        }
     }
 
     public void grab()
@@ -125,13 +257,16 @@ public class UnitController : MonoBehaviour {
         //}
         playerGrabbed = true;
 
+        this.playAnimation(UnitAnimations.getHit);
+
 
     }
 
     private void die()
     {
         Debug.Log("dead!!!");
-        animator.Play("Death");
+        this.playAnimation(UnitAnimations.death);
+        //animator.Play("Death");
         alive = false;
         GetComponent<Collider>().enabled = false;
 
