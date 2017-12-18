@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum UnitAnimations
 {
-    
+    none,
     walk,
     run,
     attack1,
@@ -22,7 +22,8 @@ public class UnitController : MonoBehaviour {
     // private bool onGround;
     //private bool falling;
     private float fallSpeed = 0.25f;
-    private float movementSpeed = 0.05f;
+    //private float movementSpeed = 0.05f;
+    private float movementSpeed = 0.15f;
 
 
 
@@ -46,8 +47,51 @@ public class UnitController : MonoBehaviour {
     private float attackRadius;
     private float health;
     private float attackDamage;
-    private float attackCooldown;
+    //private float attackCooldown;
+    private float attackCooldownMin = 2;
+    private float attackCooldownMax;
     private float timeUntilNextAttack = 0;
+
+    private UnitController attackTarget = null;
+    // TODO: set attackTimeLength to length of animation or vice versa
+    private float attackTimeLength = 0.7f;
+    private float attackingETA = 0;
+
+    private float defenderArmyMaxXPosition;
+
+    private UnitAnimations queuedAnim = UnitAnimations.none;
+
+    public void init(UnitReserve reserve, bool isEnemy, float defenderArmyMaxXPosition)
+    {
+        this.lane = reserve.lane;
+        this.isBaddie = isEnemy;
+        this.zDirection = isEnemy ? 1 : -1;
+        this.health = 100;
+        this.defenderArmyMaxXPosition = defenderArmyMaxXPosition;
+        //if(isBaddie)
+        //{
+        //    this.health /= 2;
+        //}
+        this.attackDamage = 20f;
+        //this.attackCooldown = 2;
+        //this.attackCooldownMin = 3f;
+        //this.attackCooldownMin = 2f;
+        this.attackRadius = 2.25f;
+        if (!isBaddie)
+        {
+            // give friendly units first hit
+            this.attackRadius += 0.1f;
+        }
+    }
+
+    //private float queuedAnimTime = 0;
+    //private UnitAnimations currentAnim = UnitAnimations.none;
+    //private UnitAnimations queuedAnim = UnitAnimations.none;
+
+    //public bool hitThisRound;
+
+    //private float timeSinceLastHit = 0;
+    //private bool hitReplaying = false;
 
     // Use this for initialization
     void Start()
@@ -61,19 +105,62 @@ public class UnitController : MonoBehaviour {
         animator = GetComponent<Animator>();
     }
 
+    bool importantAnimIsPlaying()
+    {
+        bool animPlaying = false;
+        List<string> nonIgnorableAnims = new List<string> { "Death", "Attack01", "Attack02", "GetHit" };
+        foreach (string animCross in nonIgnorableAnims)
+        {
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName(animCross))
+            {
+                animPlaying = true;
+                break;
+            }
+        }
+        return animPlaying;
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (!alive)
             return;
+
+        if(queuedAnim != UnitAnimations.none)
+        {
+            if(!importantAnimIsPlaying())
+            {
+                playAnimation(queuedAnim);
+                queuedAnim = UnitAnimations.none;
+            }
+        }
+
+        if(attackTarget != null && attackingETA < Time.time)
+        {
+            Debug.Log("Hit target!");
+            attackTarget.takeDamage(attackDamage);
+            attackTarget = null;
+        }
+
+        //hitThisRound = false;
+
+        //Debug.Log(animator.GetCurrentAnimatorStateInfo(0).IsName("Idle").ToString());
+
+        //if (queuedAnim != UnitAnimations.none && queuedAnimTime < Time.time)
+        //{
+        //    Debug.Log("Playing queued anim");
+        //    playAnimation(queuedAnim);
+        //}
+
+
         //screenPoint = Camera.main.WorldToScreenPoint(scanPos);
-        //if(rb.velocity.y < 0)
+        //if (rb.velocity.y < 0)
         //{
         //    Debug.Log("Falling!!!");
         //}
 
         //rb.velocity = transform.forward * movementSpeed;
-        
+
 
         if (playerGrabbed && !Input.GetMouseButton(0))
             playerLetGo = true;
@@ -100,12 +187,21 @@ public class UnitController : MonoBehaviour {
         var closestEnemy = getOpponentInAttackRadius();
         if (closestEnemy != null)
         {
-            if(timeUntilNextAttack < Time.time)
+
+            float bufferTime = 0;
+            //if (this.isBaddie && this.health < 100)
+            //    bufferTime = 0.2f;
+
+            if(timeUntilNextAttack + bufferTime < Time.time)
                 attack(closestEnemy);
         }
         else
         {
-            move();
+            if(isBaddie || (this.transform.position.x < defenderArmyMaxXPosition))
+            {
+                move();
+            }
+            
         }
         
 
@@ -123,6 +219,11 @@ public class UnitController : MonoBehaviour {
         //if (rb.velocity.y == 0 && falling)
         //{
         //    die();
+        //}
+
+        //if(hitThisRound)
+        //{
+        //    playAnimation(UnitAnimations.getHit);
         //}
 
     }
@@ -165,14 +266,40 @@ public class UnitController : MonoBehaviour {
     {
         // TODO: if unit hasn't moved or attacked in a while, die?
         this.playAnimation(UnitAnimations.attack1);
-        targetUnit.takeDamage(attackDamage);
-        timeUntilNextAttack = Time.time + attackCooldown;
+        //targetUnit.takeDamage(attackDamage);
+        attackTarget = targetUnit;
+        attackingETA = Time.time + attackTimeLength;
+        //timeUntilNextAttack = Time.time + Random.Range(attackCooldownMin, attackCooldownMax);
+        timeUntilNextAttack = Time.time + attackCooldownMin;
 
     }
 
     public void playAnimation(UnitAnimations anim)
     {
+        List<UnitAnimations> overrideAnims = new List<UnitAnimations>() { UnitAnimations.attack1, UnitAnimations.attack2, UnitAnimations.death };
+        List<UnitAnimations> ignore = new List<UnitAnimations>() { UnitAnimations.run, UnitAnimations.walk};
+        //if (!ignore.Contains(anim))
+        //{
+        //    if (nextAnimTime != 0 && nextAnimTime > Time.time && !overrideAnims.Contains(anim))
+        //    {
+        //        Debug.Log("Can't play current animation because one is already going. Queing it up.");
+
+        //        nextAnim = anim;
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        nextAnim = UnitAnimations.none;
+        //        nextAnimTime = Time.time + 2.5f;
+        //    }
+        //}
+
+        //Debug.Log("attacking!");
+
+        
+
         string animName = null;
+        float animLength = -1f;
         if (anim == UnitAnimations.death)
             animName = "Death";
         else if (anim == UnitAnimations.walk)
@@ -180,36 +307,97 @@ public class UnitController : MonoBehaviour {
         else if (anim == UnitAnimations.run)
             animName = "Run";
         else if (anim == UnitAnimations.attack1)
+        {
+            animLength = this.attackTimeLength;
+            Debug.Log("Attacking!");
+            //animName = "Attack-Hit";
             animName = "Attack01";
+            //animName = "GetHit";
+        }
         else if (anim == UnitAnimations.attack2)
             animName = "Attack02";
         else if (anim == UnitAnimations.getHit)
             animName = "GetHit";
 
+        //Debug.Log(animator.GetCurrentAnimatorStateInfo(0).fullPathHash.ToString());
+
         if (animName != null)
+        {
+            //animator.CrossFade(animName, 1f);
             //Debug.Log(animName);
-            animator.Play(animName);
+            //Debug.
+            //Debug.Log(animator.GetCurrentAnimatorStateInfo(0).IsName("Idle").ToString());
+            //List<string> nonIgnorableAnims = new List<string> { "Death", "Attack01", "Attack02", "GetHit" };
+            //bool animPlaying = false;
+            //foreach (string animCross in nonIgnorableAnims)
+            //{
+            //    if(animator.GetCurrentAnimatorStateInfo(0).IsName(animCross))
+            //    {
+            //        animPlaying = true;
+            //        break;
+            //    }
+            //}
+            //if(animLength != -1f)
+            //{
+            //    animator.Play(animName, 0, animLength);
+            //}
+            //else
+            //{
+            //    animator.Play(animName);
+            //}
+            if(anim == UnitAnimations.getHit || anim == UnitAnimations.attack1)
+            {
+                animator.CrossFade(animName, 0.3f);
+            }
+            else
+            {
+                animator.Play(animName);
+            }
+            
+
+            //if(!importantAnimIsPlaying())
+            //{
+            //    animator.Play(animName);
+            //}
+            //else if(queuedAnim == UnitAnimations.none)
+            //{
+            //    queuedAnim = anim;
+            //}
+            //else
+            //{
+            //    Debug.Log("Skipping anim");
+            //}
+
+
+
+            //Debug.Log(crossOver.ToString() + "->" + animName);
+            //if (!animPlaying)
+            //{
+            //    //animator.CrossFade(animName, 1f);
+            //    animator.Play(animName);
+            //    if(anim == queuedAnim)
+            //    {
+            //        queuedAnim = UnitAnimations.none;
+            //    }
+            //}
+            //else
+            //{
+            //    Debug.Log("Defering anmi");
+            //    queuedAnimTime = Time.time + 0.5f;
+            //    queuedAnim = anim;
+
+            //}
+
+            //if (timeSinceLastHit < Time.time && timeSinceLastHit > Time.time - 0.1f && !hitReplaying)
+            //{
+            //    animator.CrossFade(animName, 0.5f);
+            //    hitReplaying = true;
+            //}
+        }
+
     }
 
-    public void init(UnitReserve reserve, bool isEnemy)
-    {
-        this.lane = reserve.lane;
-        this.isBaddie = isEnemy;
-        this.zDirection = isEnemy ? 1 : -1;
-        this.health = 100;
-        //if(isBaddie)
-        //{
-        //    this.health /= 2;
-        //}
-        this.attackDamage = 20f;
-        this.attackCooldown = 1;
-        this.attackRadius = 2.25f;
-        if(!isBaddie)
-        {
-            // give friendly units first hit
-            this.attackRadius += 0.1f;
-        }
-    }
+
 
     private void takeDamage(float damage)
     {
@@ -218,7 +406,10 @@ public class UnitController : MonoBehaviour {
         health -= damage;
         if(health > 0)
         {
-            //playAnimation(UnitAnimations.getHit);
+            //this.hitThisRound = true;
+            playAnimation(UnitAnimations.getHit);
+            //timeSinceLastHit = Time.time;
+            //hitReplaying = false;
         }
         else
         {

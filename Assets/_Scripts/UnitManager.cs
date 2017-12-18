@@ -35,16 +35,20 @@ public class UnitManager {
 
     private bool isEnemy;
 
-    private float zCoordinate;
+    private float xCoordinate;
     private List<Vector3> spawnPositions;
 
     private GameController gameController;
+
+    public int defenderArmyUnitDepth = 5;
+    private float defenderArmyUnitDepthWidth = 1f;
+    private float defenderArmyMaxXPosition;
 
     //private GameObject floor;
     //private float timeUntilNextSpawn;
 
 
-    public UnitManager(int lanes, List<UnitReserve> reserves, bool isEnemy, int? zCoordinate = null)
+    public UnitManager(int lanes, List<UnitReserve> reserves, bool isEnemy, int? xCoordinate = null)
     {
         this.numberOfLanes = lanes;
         this.reserves = reserves;
@@ -58,26 +62,28 @@ public class UnitManager {
         float heightBuffer = 5;
         float widthBuffer = 5;
         var floorSize = floor.GetComponent<Renderer>().bounds.size;
-        float height = floorSize.x - heightBuffer;
-        float width = floorSize.z - widthBuffer;
+        float height = floorSize.z - heightBuffer;
+        float width = floorSize.x - widthBuffer;
         Debug.Log("Floor height: " + height.ToString());
+
+        defenderArmyMaxXPosition = -width/2 + defenderArmyUnitDepth * defenderArmyUnitDepthWidth;
 
         // yuck but oh well
         // if we don't have a z coordinate then use the default
-        if (zCoordinate != null)
+        if (xCoordinate != null)
         {
-            this.zCoordinate = (int)zCoordinate;
+            this.xCoordinate = (int)xCoordinate;
         }
         else
         {
             float edge = width / 2;
             if(isEnemy)
             {
-                this.zCoordinate = edge;
+                this.xCoordinate = edge;
             }
             else
             {
-                this.zCoordinate = -edge;
+                this.xCoordinate = -edge;
             }
         }
 
@@ -88,8 +94,8 @@ public class UnitManager {
         for (int i = 1; i <= lanes; ++i)
         {
             //height/2 because floor goes from -X to X
-            spawnPositions.Add(new Vector3(interval * i - height/2, 0, this.zCoordinate));
-            Debug.Log(spawnPositions[i-1].x);
+            spawnPositions.Add(new Vector3(this.xCoordinate, 0, interval * i - height / 2));
+            //Debug.Log(spawnPositions[i-1].x);
         }
     }
 
@@ -154,15 +160,15 @@ public class UnitManager {
         Quaternion rotation = reserve.unitPrefab.transform.rotation;
         if(isEnemy)
         {
-            rotation = Quaternion.LookRotation(Vector3.back);
+            rotation = Quaternion.LookRotation(Vector3.left);
         }
         else
         {
-            rotation = Quaternion.LookRotation(Vector3.forward);
+            rotation = Quaternion.LookRotation(Vector3.right);
         }
         GameObject newUnitObj = GameObject.Instantiate(reserve.unitPrefab, spawnPositions[reserve.lane], rotation);
         UnitController unit = newUnitObj.GetComponent<UnitController>();
-        unit.init(reserve, isEnemy);
+        unit.init(reserve, isEnemy, defenderArmyMaxXPosition);
         units.Add(unit);
 
     }
